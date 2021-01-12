@@ -12,7 +12,7 @@ export const DragAndDrop = () => {
 
 	const onDragEndHandler = (result) => {
 		const { destination, source, draggableId } = result;
-		//I destination = null then do nothing drag was cancelled
+		//I destination = null (dropped outside a droppable component) then do nothing
 		if (!destination) {
 			return;
 		}
@@ -24,7 +24,21 @@ export const DragAndDrop = () => {
 			return;
 		}
 		//List order persistance
-		const column = columns[source.droppableId];
+		const sourceColumn = columns[source.droppableId];
+		const destinationColumn = columns[destination.droppableId];
+		if (sourceColumn.id === destinationColumn.id) {
+			//Handle single column drag and drop
+			const newElementIds = Array.from(sourceColumn.elementIds);
+			newElementIds.splice(source.index, 1);
+			newElementIds.splice(destination.index, 0, draggableId);
+			const newColumn = { ...sourceColumn, elementIds: newElementIds };
+
+			const newState = { ...columns, [sourceColumn.id]: newColumn };
+
+			setColumns(newState);
+		} else {
+			//Handle multicolumn drag and drop
+		}
 	};
 
 	return (
