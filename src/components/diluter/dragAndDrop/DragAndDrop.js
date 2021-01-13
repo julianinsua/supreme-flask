@@ -16,13 +16,6 @@ export const DragAndDrop = () => {
 		if (!destination) {
 			return;
 		}
-		//if the dragg moves the element to the same column and the same index then do nothing
-		if (
-			destination.columnId === source.columnId &&
-			destination.index === source.index
-		) {
-			return;
-		}
 		//List order persistance
 		const sourceColumn = columns[source.droppableId];
 		const destinationColumn = columns[destination.droppableId];
@@ -33,11 +26,33 @@ export const DragAndDrop = () => {
 			newElementIds.splice(destination.index, 0, draggableId);
 			const newColumn = { ...sourceColumn, elementIds: newElementIds };
 
-			const newState = { ...columns, [sourceColumn.id]: newColumn };
+			const newStateSingle = { ...columns, [sourceColumn.id]: newColumn };
 
-			setColumns(newState);
+			setColumns(newStateSingle);
 		} else {
 			//Handle multicolumn drag and drop
+			const newElementsIdsSource = Array.from(sourceColumn.elementIds);
+			const newElementsIdsDestination = Array.from(
+				destinationColumn.elementIds
+			);
+			newElementsIdsSource.splice(source.index, 1);
+			newElementsIdsDestination.splice(destination.index, 0, draggableId);
+
+			const newColumnSource = {
+				...sourceColumn,
+				elementIds: newElementsIdsSource,
+			};
+			const newColumnDestination = {
+				...destinationColumn,
+				elementIds: newElementsIdsDestination,
+			};
+
+			const newStateDouble = {
+				...columns,
+				[sourceColumn.id]: newColumnSource,
+				[destinationColumn.id]: newColumnDestination,
+			};
+			setColumns(newStateDouble);
 		}
 	};
 
